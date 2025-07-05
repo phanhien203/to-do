@@ -1,0 +1,9 @@
+{
+  "name": "to-do-client",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "to-do-client/src",
+  "projectType": "application",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project to-do-client --web",
+  "targets": {}
+}

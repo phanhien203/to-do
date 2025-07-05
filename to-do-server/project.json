@@ -1,0 +1,27 @@
+{
+  "name": "to-do-server",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "to-do-server/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "serve": {
+      "continuous": true,
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "to-do-server:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "to-do-server:build:development"
+        },
+        "production": {
+          "buildTarget": "to-do-server:build:production"
+        }
+      }
+    }
+  }
+}
