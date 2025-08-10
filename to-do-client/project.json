@@ -3,7 +3,22 @@
   "$schema": "../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "to-do-client/src",
   "projectType": "application",
-  "tags": [],
-  "// targets": "to see all targets run: nx show project to-do-client --web",
-  "targets": {}
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "options": {
+        "outputPath": "dist/to-do-client",
+        "index": "to-do-client/src/index.html",
+        "main": "to-do-client/src/main.tsx",
+        "tsConfig": "to-do-client/tsconfig.app.json",
+        "webpackConfig": "to-do-client/webpack.config.js"
+      }
+    },
+    "serve": {
+      "executor": "@nx/webpack:dev-server",
+      "options": {
+        "buildTarget": "to-do-client:build"
+      }
+    }
+  }
 }
