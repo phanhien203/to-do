@@ -1,12 +1,8 @@
-version: '3.8'
-
 services:
   client:
     build:
       context: .
       dockerfile: to-do-client/Dockerfile
-      args:
-        NX_PUBLIC_BASE_URL: ${NX_PUBLIC_BASE_URL}
     container_name: to-do-client
     ports:
       - "8080:80"
