@@ -1,61 +1,40 @@
 import express from 'express';
-import * as path from 'path';
+import helmet from 'helmet';
 import cors from 'cors';
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+import morgan from 'morgan';
+import { errors as celebrateErrors } from 'celebrate';
 
-import todoRoutes from './routes/todo.routes';
+import { createTodoRouter } from './features/todos/create/createTodo.controller';
+import { getTodoRouter }    from './features/todos/getById/getTodo.controller';
+import { listTodosRouter }  from './features/todos/list/listTodos.controller';
+import { updateTodoRouter } from './features/todos/update/updateTodo.controller';
+import { deleteTodoRouter } from './features/todos/delete/deleteTodo.controller';
+import { errorHandler }     from './shared/middleware/errorHandler';
 
-dotenv.config();
+export function createApp() {
+  const app = express();
 
-const app = express();
-const port = process.env.PORT || 3333;
+  app.use(helmet());
+  app.use(cors());
+  app.use(express.json({ limit: '10kb' }));
+  app.use(morgan('dev'));
 
-// Connect to MongoDB Atlas
-mongoose
-  .connect(process.env.MONGODB_URI!)
-  .then(() => console.log('Connected to MongoDB Atlas'))
-  .catch((err) => console.error('MongoDB connection error:', err));
+  app.get('/health', (_req, res) => res.sendStatus(200));
 
-// CORS Configuration
-const allowedOrigins = [process.env.FRONTEND_URL].filter(Boolean);
+  app.use('/api',
+    createTodoRouter,
+    getTodoRouter,
+    listTodosRouter,
+    updateTodoRouter,
+    deleteTodoRouter
+  );
 
-const corsOptions: cors.CorsOptions = {
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: [
-    'Origin',
-    'X-Requested-With',
-    'Content-Type',
-    'Accept',
-    'Authorization',
-    'Cache-Control',
-    'Pragma',
-  ],
-  exposedHeaders: ['X-Total-Count'],
-  maxAge: 86400, // 24 hours
-};
+  app.use(celebrateErrors());
 
-app.use(cors(corsOptions));
+  app.use((_req, res) =>
+    res.status(404).json({ isSuccess: false, data: null, errors: ['Not Found'] })
+  );
 
-// Static & API routes
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use('/assets', express.static(path.join(__dirname, 'assets')));
-app.use('/api/todos', todoRoutes);
-
-// Start server
-const server = app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}/api`);
-});
-
-server.on('error', (err) => {
-  console.error('Server error:', err);
-});
+  app.use(errorHandler);
+  return app;
+}
