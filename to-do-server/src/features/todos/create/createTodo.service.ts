@@ -21,10 +21,10 @@ export class CreateTodoService {
       // 2. Ghi audit log trong cùng transaction
       await this.auditRepo.create(
         {
-          action:   'create',
-          entity:   'Todo',
+          action: 'create',
+          entity: 'Todo',
           entityId: todo._id.toString(),
-          metadata: { title: input.title, priority: input.priority }
+          metadata: { title: input.title, priority: input.priority },
         },
         session
       );
@@ -34,11 +34,9 @@ export class CreateTodoService {
       return todo;
     } catch (err) {
       await session.abortTransaction();
-      throw new ApiError(
-        500,
-        'Tạo ToDo thất bại',
-        [err instanceof Error ? err.message : 'Unknown error']
-      );
+      throw new ApiError(500, 'Tạo ToDo thất bại', [
+        err instanceof Error ? err.message : 'Unknown error',
+      ]);
     } finally {
       session.endSession();
     }
